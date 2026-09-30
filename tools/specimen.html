@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentiik design specimen</title>
+<!-- The two faces, served as the Design system chapter says: Google Fonts behind the fallback stacks tokens.css names. -->
+<link rel="stylesheet" href="{{font-source}}">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Everything below is drawn with tokens.css and nothing else: a value this page needed that
+   the tokens do not hold would be a gap in the system, so the page states none of its own
+   but the layout's. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--type-body-size); font-weight: var(--type-body-weight); line-height: 1.5; }
+code, .mono { font-family: var(--font-mono); font-size: var(--type-identifier-size-max); }
+a { color: var(--accent); }
+.bar { height: var(--bar-top); display: flex; align-items: center; gap: calc(var(--unit) * 5); padding: 0 var(--padding-page); background: var(--surface); border-bottom: var(--border-hairline) solid var(--line); }
+.bar .mark { width: 16px; height: 14px; color: var(--accent); }
+.bar .wordmark { font-family: var(--type-wordmark-font); font-size: var(--type-wordmark-size); font-weight: var(--type-wordmark-weight); letter-spacing: var(--type-wordmark-tracking); text-transform: var(--type-wordmark-case); }
+.bar .title { font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight); color: var(--muted); }
+.bar .spacer { flex: 1; }
+.button { font-family: var(--type-control-font); font-size: var(--type-control-size); font-weight: var(--type-control-weight); height: 30px; padding: 0 calc(var(--unit) * 6); border-radius: var(--radius-control); border: var(--border-hairline) solid var(--lineStrong); background: var(--raised); color: var(--text); cursor: pointer; }
+.button.primary { background: var(--accent); border-color: var(--accent); color: var(--onAccent); }
+main { padding: var(--padding-page); display: grid; gap: calc(var(--unit) * 9); max-width: 1280px; }
+.pane { position: relative; background: var(--surface); border: var(--border-hairline) solid var(--lineStrong); border-radius: var(--radius-pane); padding: calc(var(--padding-panel) + 6px) var(--padding-panel) var(--padding-panel); }
+.pane > h2 { position: absolute; top: -9px; left: 10px; margin: 0; padding: 0 6px; background: var(--bg); font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight); line-height: 18px; }
+.pane > h2 a { color: inherit; text-decoration: none; }
+.pane > h2 a::after { content: " \2197"; color: var(--faint); }
+h3 { font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-size); font-weight: var(--type-columnHead-weight); letter-spacing: var(--type-columnHead-tracking); text-transform: var(--type-columnHead-case); color: var(--muted); margin: 0 0 calc(var(--unit) * 4); }
+.row { display: flex; flex-wrap: wrap; gap: calc(var(--unit) * 5); align-items: flex-start; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: calc(var(--unit) * 5); }
+.rules { margin: calc(var(--unit) * 7) 0 0; padding: 0; list-style: none; display: grid; gap: calc(var(--unit) * 3); color: var(--muted); max-width: 760px; }
+.rules li { padding-left: calc(var(--unit) * 7); position: relative; }
+.rules li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.rules b { color: var(--text); font-weight: 600; }
+
+.swatch { border: var(--border-hairline) solid var(--line); border-radius: var(--radius-card); overflow: hidden; background: var(--raised); }
+.swatch .chip { height: 56px; border-bottom: var(--border-hairline) solid var(--line); }
+.swatch .label { padding: calc(var(--unit) * 3) calc(var(--unit) * 4); display: grid; gap: 2px; }
+.swatch .label code:last-child { color: var(--muted); font-size: var(--type-identifier-size-min); }
+
+.surfaces { display: flex; }
+.surfaces > div { flex: 1; height: 120px; padding: calc(var(--unit) * 4); border: var(--border-hairline) solid var(--line); border-left: 0; }
+.surfaces > div:first-child { border-left: var(--border-hairline) solid var(--line); border-radius: var(--radius-card) 0 0 var(--radius-card); }
+.surfaces > div:last-child { border-radius: 0 var(--radius-card) var(--radius-card) 0; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--font-mono); font-size: var(--type-identifier-size-min); }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.succeeded { color: var(--succeeded); background: var(--succeededFill); border-color: var(--succeededLine); }
+.pill.running { color: var(--running); background: var(--accentDim); border-color: var(--accentLine); }
+.pill.waiting { color: var(--waiting); background: var(--waitingFill); border-color: var(--waitingLine); }
+.pill.failed, .pill.timed_out { color: var(--failed); background: var(--failedFill); border-color: var(--failedLine); }
+.pill.queued, .pill.cancelled, .pill.skipped { color: var(--faint); background: var(--sunken); border-color: var(--lineStrong); }
+
+.type { display: grid; grid-template-columns: 170px 1fr; gap: calc(var(--unit) * 4) calc(var(--unit) * 7); align-items: baseline; }
+.type .role { color: var(--muted); }
+
+.measure { display: grid; grid-template-columns: 170px 1fr; gap: calc(var(--unit) * 4) calc(var(--unit) * 7); align-items: center; }
+.measure .ruler { background: var(--accentDim); border: var(--border-hairline) solid var(--accentLine); border-radius: 2px; }
+.radius { width: 64px; height: 40px; background: var(--raised); border: var(--border-hairline) solid var(--lineStrong); }
+.spec { display: grid; gap: calc(var(--unit) * 3); justify-items: start; }
+.border { width: 96px; height: 40px; background: var(--raised); border-style: solid; border-color: var(--lineStrong); border-radius: var(--radius-node); }
+
+.markbox { color: var(--accent); display: grid; justify-items: start; gap: calc(var(--unit) * 3); }
+.markbox .caption { color: var(--muted); }
+.never { position: relative; display: inline-block; line-height: 0; }
+.never::after { content: ""; position: absolute; left: -6px; right: -6px; top: 50%; border-top: 2px solid var(--failed); transform: rotate(-12deg); }
+
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: calc(var(--unit) * 2); }
+.icon { display: flex; align-items: center; gap: calc(var(--unit) * 4); padding: calc(var(--unit) * 3) calc(var(--unit) * 4); border-radius: var(--radius-control); background: var(--raised); border: var(--border-hairline) solid var(--line); color: var(--muted); }
+.icon code { font-size: var(--type-identifier-size-min); color: var(--text); }
+.icon.state-succeeded { color: var(--succeeded); }
+.icon.state-running { color: var(--running); }
+.icon.state-waiting { color: var(--waiting); }
+.icon.state-failed, .icon.state-timed_out { color: var(--failed); }
+.icon.state-queued, .icon.state-cancelled, .icon.state-skipped { color: var(--faint); }
+
+.example { background: var(--sunken); border: var(--border-hairline) solid var(--line); border-radius: var(--radius-innerPanel); padding: calc(var(--unit) * 5) calc(var(--unit) * 6); }
+.code { font-family: var(--type-code-font); font-size: var(--type-code-size); line-height: var(--type-code-lineHeight-max); white-space: pre; }
+footer { padding: var(--padding-page); color: var(--faint); border-top: var(--border-hairline) solid var(--line); }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <svg class="mark" viewBox="0 0 16 14" aria-hidden="true">{{mark}}</svg>
+  <span class="wordmark">agentiik</span>
+  <span class="title">Design specimen</span>
+  <span class="spacer"></span>
+  <span class="mono" id="ground"></span>
+  <button class="button" id="toggle" type="button"></button>
+</header>
+
+<main>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#design">Colour</a></h2>
+  <h3>Surfaces</h3>
+  <div class="surfaces">
+    <div style="background: var(--sunken)"><code>sunken</code><br><code data-hex="--sunken"></code></div>
+    <div style="background: var(--bg)"><code>bg</code><br><code data-hex="--bg"></code></div>
+    <div style="background: var(--surface)"><code>surface</code><br><code data-hex="--surface"></code></div>
+    <div style="background: var(--raised)"><code>raised</code><br><code data-hex="--raised"></code></div>
+  </div>
+  <h3 style="margin-top: 28px">Text, accent and state</h3>
+  <div class="grid">
+{{swatches}}
+  </div>
+  <ul class="rules">
+    <li><b>The accent is the only brand colour</b>, and marks what is interactive: primary buttons, links, selection, the selected row's marker, port dots on the graph.</li>
+    <li><b>The state ramp is separate from the accent</b>, except <code>running</code>, which borrows its hue because it is the live state. Hue is shared, form never is: a button is a solid fill with ink on it, a state an outlined pill with a dot.</li>
+    <li><b>No state is signalled by colour alone</b>: each carries a dot and a word, and a step strip adds position and width.</li>
+    <li><b>Elevation is ground value plus a hairline</b>, never a shadow, and four surface tokens are the whole vocabulary: <code>sunken</code> for code and payload panes, <code>bg</code> for the page, <code>surface</code> for panels and rails, <code>raised</code> for rows, controls and the active item.</li>
+  </ul>
+  <div class="row" style="margin-top: 18px; align-items: center">
+    <button class="button primary" type="button">Replay from invoice</button>
+    <span class="pill running">running</span>
+    <span style="color: var(--muted)">One hue, two forms: the button is a fill with ink on it, the state an outlined pill with a dot.</span>
+  </div>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#run-states">States</a></h2>
+  <div class="row">
+{{pills}}
+  </div>
+  <ul class="rules">
+    <li><b><code>queued</code>, <code>skipped</code> and <code>cancelled</code> take faint</b>: they are the absence of a state, not one.</li>
+  </ul>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#typography">Type</a></h2>
+  <div class="type">
+{{type}}
+  </div>
+  <ul class="rules">
+    <li><b>Two faces, no third</b>, both from Google Fonts with a system fallback stack.</li>
+    <li><b>Anything a person copies, types, diffs or matches against a log is monospaced</b>: run identifiers, namespaces, workflow, step and port names, image digests, exit codes, timestamps, durations, permission names, YAML and JSON. Everything a person only reads is Archivo.</li>
+  </ul>
+  <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <code>finance/monthly-invoicing</code> failed at <code>invoice</code> after <code>1m 52s</code>, image <code>sha256:1ab74e…39cc</code>, which <code>run:read_data</code> lets you open.</div>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#density-and-rhythm">Density and rhythm</a></h2>
+  <div class="measure">
+    <span class="role"><code>unit</code></span><div class="ruler" style="width: var(--unit); height: 12px"></div>
+    <span class="role"><code>bar.top</code></span><div class="ruler" style="width: 160px; height: var(--bar-top)"></div>
+    <span class="role"><code>bar.sub</code></span><div class="ruler" style="width: 160px; height: var(--bar-sub)"></div>
+    <span class="role"><code>row.body</code></span><div class="ruler" style="width: 160px; height: var(--row-body)"></div>
+    <span class="role"><code>bar.keyLine</code></span><div class="ruler" style="width: 160px; height: var(--bar-keyLine)"></div>
+    <span class="role"><code>padding.page</code>, <code>padding.panel</code></span><div class="row"><div class="ruler" style="width: var(--padding-page); height: 12px"></div><div class="ruler" style="width: var(--padding-panel); height: 12px"></div></div>
+  </div>
+  <h3 style="margin-top: 28px">Radii and borders</h3>
+  <div class="row">
+{{radii}}
+  </div>
+  <div class="row" style="margin-top: 18px">
+    <div class="spec"><div class="border" style="border-width: var(--border-hairline)"></div><code>border.hairline</code></div>
+    <div class="spec"><div class="border" style="border-width: var(--border-node)"></div><code>border.node</code></div>
+    <div class="spec"><div class="border" style="border-width: var(--border-focus); border-color: var(--accent)"></div><code>border.focus</code></div>
+  </div>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#the-mark">The mark</a></h2>
+  <div class="row" style="gap: 40px; align-items: flex-end">
+    <div class="markbox"><svg viewBox="0 0 16 14" width="160" height="140" aria-hidden="true">{{mark}}</svg><span class="caption">16 units wide, at 100, 62 and 30 %</span></div>
+    <div class="markbox"><svg viewBox="-4 -4 24 22" width="192" height="176" aria-hidden="true"><rect x="-4" y="-4" width="24" height="22" fill="none" stroke="var(--faint)" stroke-width="0.1" stroke-dasharray="0.4 0.4"/>{{mark}}</svg><span class="caption">clear space: one bar, four units, on every side</span></div>
+    <div class="markbox"><svg viewBox="0 0 16 14" width="16" height="14" aria-hidden="true">{{mark}}</svg><span class="caption">smallest: 16 × 14</span></div>
+  </div>
+  <h3 style="margin-top: 28px">Lockup</h3>
+  <div class="markbox"><svg viewBox="0 0 {{lockup-width}} 14" width="{{lockup-width-3}}" height="42" aria-label="Agentiik">{{mark}}<path fill="var(--text)" transform="translate({{lockup-offset}} 0)" d="{{wordmark}}"/></svg><span class="caption">mark and lowercase wordmark on one optical centre, nine units apart, Archivo 700</span></div>
+  <h3 style="margin-top: 28px">Never</h3>
+  <div class="row" style="gap: 36px">
+    <div class="markbox"><span class="never"><svg viewBox="-1 -1 18 16" width="72" height="64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="0.6">{{mark-rects}}</g></svg></span><span class="caption">outlined</span></div>
+    <div class="markbox"><span class="never"><svg viewBox="-4 -4 24 22" width="72" height="66" aria-hidden="true"><rect x="-3.5" y="-3.5" width="23" height="21" rx="2" fill="none" stroke="currentColor" stroke-width="0.6"/>{{mark}}</svg></span><span class="caption">boxed</span></div>
+    <div class="markbox"><span class="never"><svg viewBox="-1 -2 18 18" width="72" height="72" aria-hidden="true"><g transform="rotate(90 8 7)">{{mark}}</g></svg></span><span class="caption">rotated</span></div>
+    <div class="markbox"><span class="never"><svg viewBox="0 0 16 14" width="72" height="63" aria-hidden="true"><defs><linearGradient id="never-gradient" x1="0" x2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--waiting)"/></linearGradient></defs><g fill="url(#never-gradient)">{{mark-rects}}</g></svg></span><span class="caption">gradient-filled</span></div>
+    <div class="markbox"><span class="never"><svg viewBox="0 0 16 18" width="64" height="72" aria-hidden="true">{{mark}}<rect x="0" y="16" width="16" height="2" rx="1" opacity="0.3" fill="currentColor"/></svg></span><span class="caption">given a fourth row</span></div>
+  </div>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#iconography">Icons</a></h2>
+{{icons}}
+  <ul class="rules">
+    <li><b>Stroke only</b>, on a 16px grid at 1.5px, round caps and joins, no fill and no two-tone.</li>
+    <li><b>An icon takes muted, or the colour of the state it carries</b>, and then always comes with a word.</li>
+    <li><b>No emoji</b>, in any surface of the product.</li>
+  </ul>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#voice">Voice</a></h2>
+  <ul class="rules" style="margin-top: 0">
+    <li><b>Sentence case throughout</b>, buttons, tabs and headings included.</li>
+    <li><b>A control names its effect</b>: Approve, Reject, Replay from invoice, Load 25 more. Never OK, never Submit.</li>
+    <li><b>An error names the step, the exit code and what was refused</b>, in that order.</li>
+    <li><b>Identifiers are never translated or prettified</b>: <code>run:read_data</code>, <code>rejected</code>, <code>succeeded</code> appear as the YAML and the API spell them, so what a person reads on screen is what they type in a file.</li>
+  </ul>
+  <div class="row" style="margin-top: 18px; align-items: center">
+    <button class="button primary" type="button">Approve</button>
+    <button class="button" type="button">Reject</button>
+    <button class="button" type="button">Load 25 more</button>
+  </div>
+  <div class="example" style="margin-top: 14px"><code>invoice</code> exited <code>108</code>: the billing API refused 3 of 214 items.</div>
+</section>
+
+</main>
+
+<footer>
+  The specimen and its prose are under CC BY 4.0, the tokens, the icons and the build under Apache-2.0. Every rule quoted here is the Design system chapter's, at <a href="https://agentiik.github.io/docs#design">agentiik.github.io/docs</a>, which decides it; this page shows it drawn.
+</footer>
+
+<script>
+// The ground follows the reader's system, as tokens.css does, unless the address names one:
+// specimen.html#light or #dark, which is how CI renders each ground.
+(function () {
+  var root = document.documentElement;
+  var named = location.hash.slice(1);
+  if (named === "light" || named === "dark") root.setAttribute("data-theme", named);
+  function ground() {
+    var set = root.getAttribute("data-theme");
+    return set || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  }
+  function paint() {
+    var g = ground();
+    document.getElementById("ground").textContent = g;
+    document.getElementById("toggle").textContent = g === "dark" ? "Show the light ground" : "Show the dark ground";
+    var style = getComputedStyle(root);
+    document.querySelectorAll("[data-hex]").forEach(function (el) {
+      el.textContent = style.getPropertyValue(el.getAttribute("data-hex")).trim();
+    });
+  }
+  document.getElementById("toggle").addEventListener("click", function () {
+    root.setAttribute("data-theme", ground() === "dark" ? "light" : "dark");
+    paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

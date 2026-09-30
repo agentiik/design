@@ -31,6 +31,10 @@ hold:
   state, every port a workflow names by convention and every trigger_kind, under the
   names the documentation spells them with.
 
+The specimen sheet, specimen.html, is generated too, from tools/specimen.html, with the
+mark, the icons and a swatch, a pill, a type sample and a radius for every token set into
+it, so that the sheet can never show a token the file lacks or miss one it has.
+
 The lockup sets the outlines of mark/wordmark.svg beside the mark. tools/wordmark.py writes
 those from the face, by hand, since it alone needs a font toolchain.
 
@@ -49,6 +53,9 @@ TARGET = ROOT / "tokens.css"
 MARK = ROOT / "mark"
 WORDMARK = MARK / "wordmark.svg"
 ICONS = ROOT / "icons"
+SPECIMEN_TEMPLATE = ROOT / "tools" / "specimen.html"
+SPECIMEN = ROOT / "specimen.html"
+SURFACES = ["sunken", "bg", "surface", "raised"]
 
 # What the set must draw, as the documentation names it: the run states and a step's
 # skipped (Run states), the ports a workflow names by convention (The graph and its ports,
@@ -301,11 +308,101 @@ def check_icons():
     return {g: ordered(g) for g in ("state", "port", "trigger", "control") if g in groups}
 
 
+# What each type role is shown setting on the specimen: text it would carry in the console.
+SAMPLES = {
+    "wordmark": "agentiik",
+    "sectionTitle": "Reading a run, end to end",
+    "navigation": "Runs · Workflows · Statistics · Bricks · Sharing",
+    "control": "Replay from invoice",
+    "body": "Failures sit in a band above the table: they are almost always why the page is opened.",
+    "columnHead": "Started",
+    "identifier": "01JMZ8V1P9C4 · finance/monthly-invoicing · exit 108",
+    "code": "invoice:\n  needs:\n    - { step: normalize, port: ok, as: in }",
+}
+GROUP_TITLES = {"state": "States", "port": "Ports", "trigger": "Trigger kinds", "control": "Controls"}
+
+
+def html_escape(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def type_style(role, spec):
+    size = f"var(--type-{role}-size-max)" if isinstance(spec["size"], dict) else f"var(--type-{role}-size)"
+    parts = [f"font-family: var(--type-{role}-font)", f"font-size: {size}", f"font-weight: var(--type-{role}-weight)"]
+    if "tracking" in spec:
+        parts.append(f"letter-spacing: var(--type-{role}-tracking)")
+    if "case" in spec:
+        parts.append(f"text-transform: var(--type-{role}-case)")
+    if "lineHeight" in spec:
+        parts.append(f"line-height: var(--type-{role}-lineHeight-max); white-space: pre")
+    return "; ".join(parts)
+
+
+def type_caption(t, role, spec):
+    face = t["font"][spec["font"]]["family"]
+    size = spec["size"]
+    size = f"{size['min']:g} to {size['max']:g}px" if isinstance(size, dict) else f"{size:g}px"
+    extra = []
+    for key, word in (("weightActive", "when active"), ("weightName", "on a name")):
+        if key in spec:
+            extra.append(f"{spec[key]} {word}")
+    if "lineHeight" in spec:
+        extra.append(f"line height {spec['lineHeight']['min']:g} to {spec['lineHeight']['max']:g}px")
+    return f"{face} {size} / {spec['weight']}" + (", " + ", ".join(extra) if extra else "")
+
+
+def render_specimen(t, icons):
+    m = t["mark"]
+    rects = mark_rects(m)
+    path, box = wordmark()
+    offset = m["grid"] + m["lockup"]["gap"]
+    width = round(offset + box[0] + box[2], 3)
+    names = [n for n in t["colour"]["light"] if n not in SURFACES]
+    swatches = "\n".join(
+        f'    <div class="swatch"><div class="chip" style="background: var(--{n})"></div>'
+        f'<div class="label"><code>{n}</code><code data-hex="--{n}"></code></div></div>' for n in names)
+    pills = "\n".join(f'    <span class="pill {s}">{s}</span>' for s in REQUIRED["state"])
+    types = "\n".join(
+        f'    <span class="role"><code>{role}</code><br>{type_caption(t, role, spec)}</span>'
+        f'<span style="{type_style(role, spec)}">{html_escape(SAMPLES[role])}</span>'
+        for role, spec in t["type"].items())
+    radii = "\n".join(
+        f'    <div class="spec"><div class="radius" style="border-radius: var(--radius-{n})"></div><code>radius.{n}</code></div>'
+        for n in t["density"]["radius"])
+    blocks = []
+    for group, members in icons.items():
+        cells = "".join(
+            f'<div class="icon {group}-{n}">{(ICONS / f"{group}-{n}.svg").read_text(encoding="utf-8").strip()}<code>{n}</code></div>'
+            for n in members)
+        blocks.append(f'  <h3 style="margin-top: 6px">{GROUP_TITLES[group]}</h3>\n  <div class="icons" style="margin-bottom: 18px">{cells}</div>')
+    values = {
+        "font-source": html_escape(t["font"]["source"]),
+        "mark": f'<g fill="currentColor">{rects}</g>',
+        "mark-rects": rects,
+        "wordmark": path,
+        "lockup-width": f"{width:g}",
+        "lockup-width-3": f"{width * 3:g}",
+        "lockup-offset": f"{offset:g}",
+        "swatches": swatches,
+        "pills": pills,
+        "type": types,
+        "radii": radii,
+        "icons": "\n".join(blocks),
+    }
+    page = SPECIMEN_TEMPLATE.read_text(encoding="utf-8")
+    page = re.sub(r"\{\{([a-z0-9-]+)\}\}", lambda x: values[x.group(1)], page)
+    # After the doctype, never before it: a comment ahead of it puts a browser in quirks mode.
+    doctype, rest = page.split("\n", 1)
+    return f"{doctype}\n<!-- Generated by tools/build.py from tools/specimen.html and tokens.json: edit those, never this file. -->\n{rest}"
+
+
 def outputs(t):
     files = {TARGET: render(t)}
     for name, text in render_mark(t).items():
         files[MARK / name] = text
-    files[ICONS / "icons.json"] = json.dumps(check_icons(), indent=2) + "\n"
+    icons = check_icons()
+    files[ICONS / "icons.json"] = json.dumps(icons, indent=2) + "\n"
+    files[SPECIMEN] = render_specimen(t, icons)
     return files
 
 
