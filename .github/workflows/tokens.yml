@@ -1,0 +1,32 @@
+name: tokens
+
+# tokens.css is generated from tokens.json and both are committed, since a client pins either
+# one at a tag and reads it as it is. This fails where they disagree, or where tokens.json
+# breaks a rule tools/build.py states at its top: the same command an author runs before
+# pushing.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tokens-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: tokens.json keeps to the rules, and tokens.css is what it writes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python3 tools/build.py --check
