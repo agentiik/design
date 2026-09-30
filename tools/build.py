@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Write tokens.css from tokens.json, or check that it is what tokens.json writes.
+"""Write tokens.css and the mark from tokens.json, or check that they are what it writes.
 
-    python3 tools/build.py            write tokens.css
-    python3 tools/build.py --check    refuse where tokens.css or tokens.json is wrong
+    python3 tools/build.py            write tokens.css and mark/*.svg
+    python3 tools/build.py --check    refuse where any of them, or tokens.json, is wrong
 
-tokens.json is the source and tokens.css is generated from it and committed, so that a
-client pins either file at a tag and reads it as it is, with no build of its own. The two
-must never disagree, which is what --check holds, and tokens.json must keep to what the
-documentation's Design system chapter fixes, which is what these rules hold:
+tokens.json is the source, and tokens.css and the mark's files are generated from it and
+committed, so that a client pins any of them at a tag and reads it as it is, with no build
+of its own. They must never disagree, which is what --check holds, and tokens.json must
+keep to what the documentation's Design system chapter fixes, which is what these rules
+hold:
 
 - Both grounds carry the same tokens, among them every one the chapter lists: a client
   switching ground finds each token it used on the other.
@@ -18,6 +19,20 @@ documentation's Design system chapter fixes, which is what these rules hold:
 - Each type role names a face the tokens declare, at a weight that face is loaded with: a
   weight nobody loads is drawn by the browser's synthesis, never by the typeface.
 - Every gap is a whole number of base units, since the unit is what the rhythm is made of.
+- The mark's bars sit on its grid, one row under the other without touching, the bars of a
+  row side by side without touching, each row at a strength above none and at most full,
+  and no corner rounder than half the thinnest bar: the chapter's "the grid and the three
+  strengths are the whole specification" holds only while the specification is one a
+  client can draw.
+
+- Every icon is drawn as the chapter's Iconography says, stroke only on a 16px grid at
+  1.5px with round caps and joins, no fill and no two-tone, in currentColor so that it takes
+  muted or its state's colour from where it is set; and the set covers every run and step
+  state, every port a workflow names by convention and every trigger_kind, under the
+  names the documentation spells them with.
+
+The lockup sets the outlines of mark/wordmark.svg beside the mark. tools/wordmark.py writes
+those from the face, by hand, since it alone needs a font toolchain.
 
 Standard library only: the design repository has nothing else to install, and a token
 file that needs a toolchain to read is one a client stops reading.
@@ -31,6 +46,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "tokens.json"
 TARGET = ROOT / "tokens.css"
+MARK = ROOT / "mark"
+WORDMARK = MARK / "wordmark.svg"
+ICONS = ROOT / "icons"
+
+# What the set must draw, as the documentation names it: the run states and a step's
+# skipped (Run states), the ports a workflow names by convention (The graph and its ports,
+# Merge strategies) and the trigger kinds a run records (Triggers). Controls are open: a
+# view adds the one it draws.
+REQUIRED = {
+    "state": ["queued", "running", "waiting", "succeeded", "failed", "cancelled", "timed_out", "skipped"],
+    "port": ["in", "out", "rejected", "error", "unmatched"],
+    "trigger": ["manual", "schedule", "webhook", "event", "mcp", "terraform", "workflow"],
+}
+ICON_ROOT = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="none" '
+             'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">')
+ICON_NAME = re.compile(r"^(state|port|trigger|control)-([a-z]+(?:_[a-z]+)*)$")
 
 # The tokens the Design system chapter lists, by the names it gives them. Anything else in
 # tokens.json is derived from the chapter's mockups and named there too.
@@ -81,6 +112,24 @@ def check_source(t):
     for gap in t["density"]["gaps"]:
         if gap % unit:
             problems.append(f"the gap {gap} is not a whole number of {unit}px units")
+
+    m = t["mark"]
+    bottom = 0
+    for i, row in enumerate(m["rows"]):
+        if row["y"] < bottom or (i and row["y"] == bottom):
+            problems.append(f"mark.rows[{i}] starts at {row['y']}, touching or overlapping the row above, which ends at {bottom}")
+        bottom = row["y"] + row["height"]
+        if not 0 < row["strength"] <= 1:
+            problems.append(f"mark.rows[{i}].strength is {row['strength']}, where a strength is above 0 and at most 1")
+        if m["radius"] * 2 > row["height"]:
+            problems.append(f"mark.radius {m['radius']} is more than half mark.rows[{i}]'s height, {row['height']}")
+        right = 0
+        for j, bar in enumerate(row["bars"]):
+            if bar["x"] < right or (j and bar["x"] == right):
+                problems.append(f"mark.rows[{i}].bars[{j}] starts at {bar['x']}, touching or overlapping the bar before it")
+            right = bar["x"] + bar["width"]
+            if right > m["grid"]:
+                problems.append(f"mark.rows[{i}].bars[{j}] ends at {right}, past the {m['grid']}-unit grid")
 
     if problems:
         refuse(problems)
@@ -157,20 +206,126 @@ def render(t):
     return "".join(out)
 
 
+def mark_height(m):
+    return max(row["y"] + row["height"] for row in m["rows"])
+
+
+def mark_rects(m):
+    out = []
+    for row in m["rows"]:
+        rects = "".join(
+            f'<rect x="{bar["x"]:g}" y="{row["y"]:g}" width="{bar["width"]:g}" height="{row["height"]:g}" rx="{m["radius"]:g}"/>'
+            for bar in row["bars"]
+        )
+        out.append(rects if row["strength"] == 1 else f'<g opacity="{row["strength"]:g}">{rects}</g>')
+    return "".join(out)
+
+
+def svg(view_box, body, what):
+    return (
+        f"<!-- Generated by tools/build.py from tokens.json: {what}. -->\n"
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view_box}" role="img" aria-label="Agentiik">{body}</svg>\n'
+    )
+
+
+def wordmark():
+    """The outline and ink box tools/wordmark.py wrote."""
+    text = WORDMARK.read_text(encoding="utf-8")
+    box = [float(v) for v in re.search(r'viewBox="([^"]+)"', text).group(1).split()]
+    path = re.search(r'<path d="([^"]+)"/>', text).group(1)
+    return path, box
+
+
+def render_mark(t):
+    """Every file of mark/ but the wordmark, by name."""
+    m = t["mark"]
+    grid, height, clear = m["grid"], mark_height(m), m["clearSpace"]
+    rects = mark_rects(m)
+    side = grid + 2 * clear
+    square = f"{-clear:g} {-(side - height) / 2:g} {side:g} {side:g}"
+    path, box = wordmark()
+    offset = grid + m["lockup"]["gap"]
+    width = round(offset + box[0] + box[2], 3)
+    files = {
+        "mark.svg": svg(f"0 0 {grid:g} {height:g}", f'<g fill="currentColor">{rects}</g>',
+                        "the mark in the colour of the text around it, for a client that sets it to the accent"),
+    }
+    for ground in ("light", "dark"):
+        c = t["colour"][ground]
+        files[f"mark-{ground}.svg"] = svg(
+            f"0 0 {grid:g} {height:g}", f'<g fill="{c["accent"]}">{rects}</g>',
+            f"the mark in the {ground} ground's accent")
+        files[f"mark-square-{ground}.svg"] = svg(
+            square, f'<g fill="{c["accent"]}">{rects}</g>',
+            f"the mark in the {ground} ground's accent, centred on a square with its clear space")
+        files[f"lockup-{ground}.svg"] = svg(
+            f"0 0 {width:g} {height:g}",
+            f'<g fill="{c["accent"]}">{rects}</g><path fill="{c["text"]}" transform="translate({offset:g} 0)" d="{path}"/>',
+            f"the lockup on the {ground} ground, the mark in its accent and the wordmark in its text colour")
+    return files
+
+
+def check_icons():
+    """The icons by group, once every one keeps to the Iconography rules."""
+    problems = []
+    groups = {}
+    for path in sorted(ICONS.glob("*.svg")):
+        m = ICON_NAME.match(path.stem)
+        if not m:
+            problems.append(f"icons/{path.name} is not named group-name, the group one of state, port, trigger, control")
+            continue
+        groups.setdefault(m.group(1), []).append(m.group(2))
+        text = path.read_text(encoding="utf-8")
+        body = text.strip()
+        if not body.startswith(ICON_ROOT) or not body.endswith("</svg>"):
+            problems.append(f"icons/{path.name} does not open with the one root every icon has: 16px, stroke only at 1.5 in currentColor, round caps and joins")
+            continue
+        inner = body[len(ICON_ROOT):-len("</svg>")]
+        for pattern, why in ((r"\sfill=", "a fill of its own"), (r"\sstroke=", "a stroke colour of its own"),
+                             (r"stroke-width", "a stroke width of its own"), (r"\s(style|class)=", "a style or class"),
+                             (r"<(text|image|style|use|linearGradient|radialGradient)\b", "text, an image, a style, a reference or a gradient")):
+            if re.search(pattern, inner):
+                problems.append(f"icons/{path.name} carries {why}, where every icon is one stroke in currentColor")
+    for group, names in REQUIRED.items():
+        missing = [n for n in names if n not in groups.get(group, [])]
+        if missing:
+            problems.append(f"icons/ has no {group} icon for {', '.join(missing)}")
+    if problems:
+        for p in problems:
+            print(p, file=sys.stderr)
+        raise SystemExit(1)
+    # The documented order first, since a client lays states out in it, then the rest by name.
+    def ordered(group):
+        known = REQUIRED.get(group, [])
+        return [n for n in known if n in groups[group]] + sorted(n for n in groups[group] if n not in known)
+    return {g: ordered(g) for g in ("state", "port", "trigger", "control") if g in groups}
+
+
+def outputs(t):
+    files = {TARGET: render(t)}
+    for name, text in render_mark(t).items():
+        files[MARK / name] = text
+    files[ICONS / "icons.json"] = json.dumps(check_icons(), indent=2) + "\n"
+    return files
+
+
 def main():
     checking = "--check" in sys.argv[1:]
     tokens = json.loads(SOURCE.read_text(encoding="utf-8"))
     check_source(tokens)
-    css = render(tokens)
+    files = outputs(tokens)
     if checking:
-        current = TARGET.read_text(encoding="utf-8") if TARGET.exists() else ""
-        if current != css:
-            print("tokens.css is not what tokens.json writes: run python3 tools/build.py and commit both", file=sys.stderr)
+        stale = [p.relative_to(ROOT).as_posix() for p, text in files.items()
+                 if not p.exists() or p.read_text(encoding="utf-8") != text]
+        if stale:
+            print(f"{', '.join(stale)}: not what tokens.json writes: run python3 tools/build.py and commit them", file=sys.stderr)
             raise SystemExit(1)
-        print("tokens.json keeps to the rules, and tokens.css is what it writes")
+        print("tokens.json keeps to the rules, and every file generated from it is what it writes")
         return
-    TARGET.write_text(css, encoding="utf-8")
-    print(f"wrote {TARGET.name}")
+    for path, text in files.items():
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        print(f"wrote {path.relative_to(ROOT).as_posix()}")
 
 
 if __name__ == "__main__":
