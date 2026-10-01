@@ -45,7 +45,7 @@ To change a value, change it on the site first, then in `tokens.json`, run `pyth
 
 [specimen.html](specimen.html) draws every token, type role, measure, state pill, the mark and every icon, each beside the chapter's rule it shows and a link to it, on the reader's ground or on the one its address names (`specimen.html#dark`). `tools/build.py` writes it from `tools/specimen.html`, so it can never show a token the file lacks or miss one it has.
 
-The `specimen` workflow renders it on both grounds and compares each render, pixel for pixel, with the references in [tests/specimen](tests/specimen), so a token edit fails there first, as the change it makes. A change that was meant commits new references with it, taken from the renders the failed run keeps as its `specimen-renders` artifact: the workflow runs in the Playwright image `package.json` pins, and a reference taken anywhere else would not match what the check renders.
+The `specimen` workflow renders it on both grounds and compares each render, pixel for pixel, with the references in [tests/specimen](tests/specimen), so a token edit fails there first, as the change it makes. A change that was meant commits new references with it, rendered by the workflow itself: dispatched on the branch with `references` set, it renders them in the Playwright image `package.json` pins and commits them there, since a reference taken anywhere else would not match what the check renders. A failed run also keeps its renders and their differences as its `specimen-renders` artifact, to see what changed.
 
 ## Licence
 
