@@ -194,7 +194,7 @@ def render(t):
     out.append(f"  /* Gaps are {units} units: calc(var(--unit) * n). */\n")
     out.append(f"  --unit: {px(d['unit'])};\n")
     out.append(f"  --window-min: {px(d['window']['min'])};\n")
-    for group in ("bar", "row", "padding", "radius", "border"):
+    for group in ("bar", "sidebar", "row", "padding", "radius", "border"):
         for name, value in d[group].items():
             out.append(f"  --{group}-{name}: {px(value)};\n")
     out.append("}\n\n")
@@ -311,12 +311,14 @@ def check_icons():
 # What each type role is shown setting on the specimen: text it would carry in the console.
 SAMPLES = {
     "wordmark": "agentiik",
+    "pageTitle": "monthly-invoicing",
     "sectionTitle": "Reading a run, end to end",
     "navigation": "Runs · Workflows · Statistics · Bricks · Sharing",
     "control": "Replay from invoice",
     "body": "Failures sit in a band above the table: they are almost always why the page is opened.",
     "columnHead": "Started",
-    "identifier": "01JMZ8V1P9C4 · finance/monthly-invoicing · exit 108",
+    "name": "finance/monthly-invoicing · alice · invoice.ok",
+    "identifier": "01JMZ8V1P9C4 · a3f9c1e · exit 108",
     "code": "invoice:\n  needs:\n    - { step: normalize, port: ok, as: in }",
 }
 GROUP_TITLES = {"state": "States", "port": "Ports", "trigger": "Trigger kinds", "control": "Controls"}

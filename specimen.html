@@ -15,6 +15,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--type-body-size); font-weight: var(--type-body-weight); line-height: 1.5; }
 code, .mono { font-family: var(--font-mono); font-size: var(--type-identifier-size-max); }
+.name { font-family: var(--type-name-font); font-weight: var(--type-name-weight); }
+.figure { font-variant-numeric: tabular-nums; }
 a { color: var(--accent); }
 .bar { height: var(--bar-top); display: flex; align-items: center; gap: calc(var(--unit) * 5); padding: 0 var(--padding-page); background: var(--surface); border-bottom: var(--border-hairline) solid var(--line); }
 .bar .mark { width: 16px; height: 14px; color: var(--accent); }
@@ -46,7 +48,7 @@ h3 { font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-
 .surfaces > div:first-child { border-left: var(--border-hairline) solid var(--line); border-radius: var(--radius-card) 0 0 var(--radius-card); }
 .surfaces > div:last-child { border-radius: 0 var(--radius-card) var(--radius-card) 0; }
 
-.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--font-mono); font-size: var(--type-identifier-size-min); }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--type-name-font); font-weight: var(--type-name-weight); font-size: 12.5px; }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .pill.succeeded { color: var(--succeeded); background: var(--succeededFill); border-color: var(--succeededLine); }
 .pill.running { color: var(--running); background: var(--accentDim); border-color: var(--accentLine); }
@@ -159,22 +161,24 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
 <section class="pane">
   <h2><a href="https://agentiik.github.io/docs#typography">Type</a></h2>
   <div class="type">
-    <span class="role"><code>wordmark</code><br>Archivo 15px / 700</span><span style="font-family: var(--type-wordmark-font); font-size: var(--type-wordmark-size); font-weight: var(--type-wordmark-weight); letter-spacing: var(--type-wordmark-tracking); text-transform: var(--type-wordmark-case)">agentiik</span>
-    <span class="role"><code>sectionTitle</code><br>Archivo 13px / 600</span><span style="font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight)">Reading a run, end to end</span>
-    <span class="role"><code>navigation</code><br>Archivo 13px / 400, 500 when active</span><span style="font-family: var(--type-navigation-font); font-size: var(--type-navigation-size); font-weight: var(--type-navigation-weight)">Runs · Workflows · Statistics · Bricks · Sharing</span>
-    <span class="role"><code>control</code><br>Archivo 12.5px / 500</span><span style="font-family: var(--type-control-font); font-size: var(--type-control-size); font-weight: var(--type-control-weight)">Replay from invoice</span>
-    <span class="role"><code>body</code><br>Archivo 12px / 400</span><span style="font-family: var(--type-body-font); font-size: var(--type-body-size); font-weight: var(--type-body-weight)">Failures sit in a band above the table: they are almost always why the page is opened.</span>
-    <span class="role"><code>columnHead</code><br>Archivo 10.5px / 600</span><span style="font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-size); font-weight: var(--type-columnHead-weight); letter-spacing: var(--type-columnHead-tracking); text-transform: var(--type-columnHead-case)">Started</span>
-    <span class="role"><code>identifier</code><br>JetBrains Mono 11 to 12.5px / 400, 500 on a name</span><span style="font-family: var(--type-identifier-font); font-size: var(--type-identifier-size-max); font-weight: var(--type-identifier-weight)">01JMZ8V1P9C4 · finance/monthly-invoicing · exit 108</span>
-    <span class="role"><code>code</code><br>JetBrains Mono 11px / 400, line height 18 to 19px</span><span style="font-family: var(--type-code-font); font-size: var(--type-code-size); font-weight: var(--type-code-weight); line-height: var(--type-code-lineHeight-max); white-space: pre">invoice:
+    <span class="role"><code>wordmark</code><br>Archivo 16px / 700</span><span style="font-family: var(--type-wordmark-font); font-size: var(--type-wordmark-size); font-weight: var(--type-wordmark-weight); letter-spacing: var(--type-wordmark-tracking); text-transform: var(--type-wordmark-case)">agentiik</span>
+    <span class="role"><code>pageTitle</code><br>Archivo 20px / 600</span><span style="font-family: var(--type-pageTitle-font); font-size: var(--type-pageTitle-size); font-weight: var(--type-pageTitle-weight)">monthly-invoicing</span>
+    <span class="role"><code>sectionTitle</code><br>Archivo 15px / 600</span><span style="font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight)">Reading a run, end to end</span>
+    <span class="role"><code>navigation</code><br>Archivo 14px / 400, 600 when active</span><span style="font-family: var(--type-navigation-font); font-size: var(--type-navigation-size); font-weight: var(--type-navigation-weight)">Runs · Workflows · Statistics · Bricks · Sharing</span>
+    <span class="role"><code>control</code><br>Archivo 13.5px / 500</span><span style="font-family: var(--type-control-font); font-size: var(--type-control-size); font-weight: var(--type-control-weight)">Replay from invoice</span>
+    <span class="role"><code>body</code><br>Archivo 14px / 400</span><span style="font-family: var(--type-body-font); font-size: var(--type-body-size); font-weight: var(--type-body-weight)">Failures sit in a band above the table: they are almost always why the page is opened.</span>
+    <span class="role"><code>columnHead</code><br>Archivo 12.5px / 600</span><span style="font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-size); font-weight: var(--type-columnHead-weight); letter-spacing: var(--type-columnHead-tracking); text-transform: var(--type-columnHead-case)">Started</span>
+    <span class="role"><code>name</code><br>Archivo 14px / 500</span><span style="font-family: var(--type-name-font); font-size: var(--type-name-size); font-weight: var(--type-name-weight)">finance/monthly-invoicing · alice · invoice.ok</span>
+    <span class="role"><code>identifier</code><br>JetBrains Mono 12 to 13px / 400</span><span style="font-family: var(--type-identifier-font); font-size: var(--type-identifier-size-max); font-weight: var(--type-identifier-weight)">01JMZ8V1P9C4 · a3f9c1e · exit 108</span>
+    <span class="role"><code>code</code><br>JetBrains Mono 12.5px / 400, line height 19 to 20px</span><span style="font-family: var(--type-code-font); font-size: var(--type-code-size); font-weight: var(--type-code-weight); line-height: var(--type-code-lineHeight-max); white-space: pre">invoice:
   needs:
     - { step: normalize, port: ok, as: in }</span>
   </div>
   <ul class="rules">
     <li><b>Two faces, no third</b>, both from Google Fonts with a system fallback stack.</li>
-    <li><b>Anything a person copies, types, diffs or matches against a log is monospaced</b>: run identifiers, namespaces, workflow, step and port names, image digests, exit codes, timestamps, durations, permission names, YAML and JSON. Everything a person only reads is Archivo.</li>
+    <li><b>Code is monospaced, and nothing else</b>: run identifiers, commit and image digests, exit codes, YAML, JSON, logs and expressions are JetBrains Mono, since a person copies, diffs and matches them against a log. Namespaces, workflow, step and port names, logins and permission names are names, Archivo at 500; timestamps, durations and counts are Archivo with tabular figures, so that a column of them still lines up. A screen of names set in a monospace reads as a terminal, which the web console is not; <code>agk console</code> draws everything in the terminal's face.</li>
   </ul>
-  <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <code>finance/monthly-invoicing</code> failed at <code>invoice</code> after <code>1m 52s</code>, image <code>sha256:1ab74e…39cc</code>, which <code>run:read_data</code> lets you open.</div>
+  <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <span class="name">finance/monthly-invoicing</span> failed at <span class="name">invoice</span> after <span class="figure">1m 52s</span>, image <code>sha256:1ab74e…39cc</code>, which <span class="name">run:read_data</span> lets you open.</div>
 </section>
 
 <section class="pane">
