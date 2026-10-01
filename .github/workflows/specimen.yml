@@ -1,0 +1,85 @@
+name: specimen
+
+# The specimen sheet rendered on each ground and compared, pixel for pixel, with the references
+# in tests/specimen, so that a token edit shows here as the change it makes and a change nobody
+# asked for fails. A change that was asked for commits new references with it.
+#
+# The job runs in the Playwright image at the version package.json pins, because text is
+# antialiased by whatever the machine has: a reference is only comparable with a render from
+# the same image. On a failure the renders and the differences are kept as an artifact. A change
+# that was asked for takes its references from that image too, rather than from anybody's own
+# machine: dispatched with references set, the workflow renders them again and commits them to
+# the branch it was dispatched on, where the next run compares against them.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      references:
+        description: Render the references again in the Playwright image and commit them to this branch
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: specimen-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    name: The specimen on both grounds is what it was
+    if: ${{ !inputs.references }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+
+      - run: npx playwright test
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: specimen-renders
+          path: |
+            test-results/
+            tests/specimen/
+          if-no-files-found: ignore
+
+  # The references, rendered where the check renders and committed by the workflow, which is the
+  # only place a reference the check accepts can come from. A push with the workflow's own token
+  # starts no workflow, so the check is run again by the next push or by dispatching it.
+  references:
+    name: The references, rendered again
+    if: ${{ inputs.references }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+
+      - run: npx playwright test --update-snapshots=all
+
+      - run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/specimen
+          if git diff --cached --quiet; then
+            echo "The references are what this image renders already."
+          else
+            git commit -m "Render the specimen references in the Playwright image"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
