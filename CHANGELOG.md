@@ -10,6 +10,7 @@ Every repository of the project carries the same version and is tagged at the sa
 
 - The web console's type is larger and less of a terminal's: body and navigation 14px, controls 13.5px, section titles 15px, a new `pageTitle` at 20px, column heads 12.5px in sentence case rather than spaced capitals. A new `name` role sets namespaces, workflow, step and port names, logins and permission names in Archivo at 500, and `identifier` and `code`, JetBrains Mono at 12 to 13px and 12.5px, are kept for what is code: run identifiers, digests, exit codes, YAML, JSON and logs. The specimen's rule says so, and its state pills are set in Archivo.
 - `sidebar.width` and `sidebar.collapsed`, 232 and 56px, are the web console's navigation down its left side, and `row.header` is 36px.
+- The controls gain the icons that navigation draws: `control-home`, `control-runs`, `control-workflows`, `control-statistics`, `control-runners`, `control-users`, `control-groups`, `control-namespaces` and `control-sidebar`, which folds it.
 
 ## v0.5.0, 2026-09-30
 
