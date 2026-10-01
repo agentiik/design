@@ -193,7 +193,11 @@ def render(t):
     units = ", ".join(str(g // d["unit"]) for g in d["gaps"])
     out.append(f"  /* Gaps are {units} units: calc(var(--unit) * n). */\n")
     out.append(f"  --unit: {px(d['unit'])};\n")
-    out.append(f"  --window-min: {px(d['window']['min'])};\n")
+    # The widths the console lays itself out by: under compact the sidebar folds to its icons, under
+    # narrow it is a drawer. A media query reads no variable, so the console writes them in its own
+    # queries too; these say what they are to anyone reading the tokens.
+    out.append(f"  --window-compact: {px(d['window']['compact'])};\n")
+    out.append(f"  --window-narrow: {px(d['window']['narrow'])};\n")
     for group in ("bar", "sidebar", "row", "padding", "radius", "border"):
         for name, value in d[group].items():
             out.append(f"  --{group}-{name}: {px(value)};\n")
