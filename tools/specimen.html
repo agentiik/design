@@ -14,6 +14,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--type-body-size); font-weight: var(--type-body-weight); line-height: 1.5; }
 code, .mono { font-family: var(--font-mono); font-size: var(--type-identifier-size-max); }
+.name { font-family: var(--type-name-font); font-weight: var(--type-name-weight); }
+.figure { font-variant-numeric: tabular-nums; }
 a { color: var(--accent); }
 .bar { height: var(--bar-top); display: flex; align-items: center; gap: calc(var(--unit) * 5); padding: 0 var(--padding-page); background: var(--surface); border-bottom: var(--border-hairline) solid var(--line); }
 .bar .mark { width: 16px; height: 14px; color: var(--accent); }
@@ -45,7 +47,7 @@ h3 { font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-
 .surfaces > div:first-child { border-left: var(--border-hairline) solid var(--line); border-radius: var(--radius-card) 0 0 var(--radius-card); }
 .surfaces > div:last-child { border-radius: 0 var(--radius-card) var(--radius-card) 0; }
 
-.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--font-mono); font-size: var(--type-identifier-size-min); }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--type-name-font); font-weight: var(--type-name-weight); font-size: 12.5px; }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .pill.succeeded { color: var(--succeeded); background: var(--succeededFill); border-color: var(--succeededLine); }
 .pill.running { color: var(--running); background: var(--accentDim); border-color: var(--accentLine); }
@@ -137,9 +139,9 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
   </div>
   <ul class="rules">
     <li><b>Two faces, no third</b>, both from Google Fonts with a system fallback stack.</li>
-    <li><b>Anything a person copies, types, diffs or matches against a log is monospaced</b>: run identifiers, namespaces, workflow, step and port names, image digests, exit codes, timestamps, durations, permission names, YAML and JSON. Everything a person only reads is Archivo.</li>
+    <li><b>Code is monospaced, and nothing else</b>: run identifiers, commit and image digests, exit codes, YAML, JSON, logs and expressions are JetBrains Mono, since a person copies, diffs and matches them against a log. Namespaces, workflow, step and port names, logins and permission names are names, Archivo at 500; timestamps, durations and counts are Archivo with tabular figures, so that a column of them still lines up. A screen of names set in a monospace reads as a terminal, which the web console is not; <code>agk console</code> draws everything in the terminal's face.</li>
   </ul>
-  <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <code>finance/monthly-invoicing</code> failed at <code>invoice</code> after <code>1m 52s</code>, image <code>sha256:1ab74e…39cc</code>, which <code>run:read_data</code> lets you open.</div>
+  <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <span class="name">finance/monthly-invoicing</span> failed at <span class="name">invoice</span> after <span class="figure">1m 52s</span>, image <code>sha256:1ab74e…39cc</code>, which <span class="name">run:read_data</span> lets you open.</div>
 </section>
 
 <section class="pane">
