@@ -14,6 +14,7 @@ Every repository of the project carries the same version and is tagged at the sa
 - `window.min`, the 1280px the web console assumed, gives way to `window.compact` and `window.narrow`, 1100 and 760px: under the first the sidebar folds to its icons, under the second it opens over the screen as a drawer, since the console is now drawn at any width.
 - The controls gain the icons that navigation draws: `control-home`, `control-runs`, `control-workflows`, `control-statistics`, `control-runners`, `control-users`, `control-groups`, `control-namespaces` and `control-sidebar`, which folds it.
 - `control-variables`, braces around an x, is the icon of a namespace's variables in the web console's navigation.
+- `CLAUDE.md` is the copy of `agentiik/.github`'s as it stands at v0.6.0: twelve repositories, the web console part of `agentiik`, and the roadmap at 685 tasks in sixty-three groups.
 
 ## v0.5.0, 2026-09-30
 
