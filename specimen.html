@@ -132,6 +132,7 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
     <li><b>The accent is the only brand colour</b>, and marks what is interactive: primary buttons, links, selection, the selected row's marker, port dots on the graph.</li>
     <li><b>The state ramp is separate from the accent</b>, except <code>running</code>, which borrows its hue because it is the live state. Hue is shared, form never is: a button is a solid fill with ink on it, a state an outlined pill with a dot.</li>
     <li><b>No state is signalled by colour alone</b>: each carries a dot and a word, and a step strip adds position and width.</li>
+    <li><b>Every word is drawn at 4.5:1 at least</b> against what it is drawn on, WCAG 2's level AA for text of ordinary size, whatever its role: <code>text</code>, <code>muted</code>, <code>faint</code> and the accent on each surface, a state's ink on its pill's fill, and <code>onAccent</code> on the accent. The word carries the state, and a word nobody can read carries none.</li>
     <li><b>Elevation is ground value plus a hairline</b>, never a shadow, and four surface tokens are the whole vocabulary: <code>sunken</code> for code and payload panes, <code>bg</code> for the page, <code>surface</code> for panels and rails, <code>raised</code> for rows, controls and the active item.</li>
   </ul>
   <div class="row" style="margin-top: 18px; align-items: center">

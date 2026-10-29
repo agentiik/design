@@ -16,6 +16,13 @@ hold:
   search finds every use of it.
 - running is the accent on each ground: the chapter makes it "the one state that borrows
   the accent hue", and two values that must be equal are one value typed twice.
+- Every word is drawn at 4.5:1 at least against what it is drawn on, WCAG 2's level AA for
+  text of ordinary size, held for every word whatever its role: text, muted, faint and the
+  accent on each of the four surfaces, each state's ink on its pill's fill, running's on
+  accentDim, and onAccent on the accent. The chapter's Colour rules state the level, since
+  a state is carried by its word and a word nobody can read carries none; and the ratio is
+  WCAG 2's, from each colour's relative luminance, so that it is the figure an audit
+  computes.
 - Each type role names a face the tokens declare, at a weight that face is loaded with: a
   weight nobody loads is drawn by the browser's synthesis, never by the typeface.
 - Every gap is a whole number of base units, since the unit is what the rhythm is made of.
@@ -79,6 +86,36 @@ CORE = [
 
 HEX = re.compile(r"^#[0-9A-F]{6}$")
 
+# The level every word keeps against what it is drawn on, and the pairings that draw a word: a
+# token on a surface, a state's ink on its pill, the ink of a button on its fill. A hairline or a
+# swatch is no word, and keeps no level.
+CONTRAST = 4.5
+WORDS = ["text", "muted", "faint", "accent"]
+PILLS = {"succeeded": "succeededFill", "waiting": "waitingFill", "failed": "failedFill", "running": "accentDim"}
+
+
+def luminance(value):
+    """WCAG 2's relative luminance of #RRGGBB, at sRGB's threshold of 0.04045, which WCAG 2.0 wrote
+    0.03928: no channel of eight bits lies between the two, so either gives the same ratio."""
+    channels = [int(value[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a, b):
+    """WCAG 2's contrast ratio of two colours, the lighter's luminance over the darker's."""
+    high, low = sorted((luminance(a), luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+
+def pairings():
+    """Each word a ground draws, as (ink, what it is drawn on)."""
+    for word in WORDS:
+        for surface in SURFACES:
+            yield word, surface
+    yield from PILLS.items()
+    yield "onAccent", "accent"
+
 
 def refuse(problems):
     for p in problems:
@@ -104,6 +141,13 @@ def check_source(t):
                 problems.append(f"{g}.{name} is {value!r}, not #RRGGBB in capitals")
         if values.get("running") != values.get("accent"):
             problems.append(f"{g}.running is {values.get('running')}, where it is the accent, {values.get('accent')}")
+        for ink, ground in pairings():
+            if not (HEX.match(values.get(ink, "")) and HEX.match(values.get(ground, ""))):
+                continue
+            ratio = contrast(values[ink], values[ground])
+            if ratio < CONTRAST:
+                problems.append(f"{g}.{ink}, {values[ink]}, is {ratio:.2f}:1 on {g}.{ground}, {values[ground]}, "
+                                f"under the {CONTRAST}:1 a word keeps against what it is drawn on")
 
     fonts = t["font"]
     for role, spec in t["type"].items():
