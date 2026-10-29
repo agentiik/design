@@ -6,6 +6,10 @@ Every repository of the project carries the same version and is tagged at the sa
 
 `0.y.z` promises nothing beyond itself: what a release here describes may be gone in the next one.
 
+## Unreleased
+
+- `CLAUDE.md` is the copy of `agentiik/.github`'s, which no longer counts the roadmap's tasks, groups or Feature issues: the roadmap counts them in each milestone's tally, and the 685 tasks the copy named were already 696 at the v0.6.0 documentation.
+
 ## v0.6.0, 2026-10-02
 
 - The design system is published here rather than drawn in each client: `tokens.json`, the colours of both grounds, the two faces, the type roles and the density scale under the documentation's own names; `tokens.css`, the same values as CSS custom properties, which `tools/build.py` writes from it and with `--check` refuses where the two differ or a rule is broken; the mark, its grid and lockup, drawn by the same script into `mark/`, with the wordmark as outlines of Archivo Bold and the favicons in `mark/png/`; 60 icons in `icons/`, every run and step state, port, trigger kind and control a view draws, stroke only on a 16px grid, indexed by `icons/icons.json`; and `specimen.html`, every token, role, pill, the mark and every icon beside the rule it shows, which the `specimen` workflow renders on both grounds and compares pixel for pixel with its references. Tokens and icons are Apache-2.0, the specimen, the guidance and the exported images CC BY 4.0. A client pins this release's tag, `v0.6.0`, as the web console and `agk console` copy it.
