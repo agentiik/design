@@ -6,6 +6,10 @@ Every repository of the project carries the same version and is tagged at the sa
 
 `0.y.z` promises nothing beyond itself: what a release here describes may be gone in the next one.
 
+## v0.7.1, 2026-10-30
+
+- Nothing changed here. The version moves because every repository carries the same one, which [Versioning](https://agentiik.github.io/docs#versioning) sets out.
+
 ## v0.7.0, 2026-10-30
 
 - Every word is drawn at 4.5:1 at least against what it is drawn on, WCAG 2's level AA for text of ordinary size, as the documentation's Colour rules now state: `text`, `muted`, `faint` and `accent` on each of the four surfaces, each state's ink on its pill's fill and `onAccent` on `accent`. `faint` moves to `#898989` dark and `#696969` light, where it was `#777777` and `#888888`, and was 3.55:1 on the dark `raised` and 2.92:1 on the light `sunken`, inside the pill of `queued`, `skipped` and `cancelled`; the light `succeeded` and `waiting` inks move to `#2B754A` and `#8F610A`, where they were `#2E7D4F` at 4.08:1 and `#96660A` at 4.18:1 on their pills' fills. `tools/build.py --check`, which the `tokens` workflow runs, refuses a token below the level, naming the pairing and its ratio, and the specimen states the rule beside the others. The specimen's references are rendered again.
