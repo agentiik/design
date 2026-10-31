@@ -72,14 +72,18 @@ jobs:
 
       - run: npx playwright test --update-snapshots=all
 
+      # The mark's rasters are drawn by the same browser, so that a change of the accent reaches
+      # mark/png without a Chromium on anybody's machine.
+      - run: npm run export
+
       - run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/specimen
+          git add tests/specimen mark/png
           if git diff --cached --quiet; then
-            echo "The references are what this image renders already."
+            echo "The references and the rasters are what this image renders already."
           else
-            git commit -m "Render the specimen references in the Playwright image"
+            git commit -m "Render the specimen references and the mark's rasters in the Playwright image"
             git push origin "HEAD:$GITHUB_REF_NAME"
           fi

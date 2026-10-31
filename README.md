@@ -37,7 +37,7 @@ To change a value, change it on the site first, then in `tokens.json`, run `pyth
 | `mark-square-light.svg`, `mark-square-dark.svg` | The mark centred on a 24-unit square that holds its clear space, for an avatar or an application icon. |
 | `lockup-light.svg`, `lockup-dark.svg` | The mark and the wordmark, nine units apart on one optical centre, the wordmark in the ground's `text`. |
 | `wordmark.svg` | The wordmark as outlines of Archivo Bold, written by `tools/wordmark.py` from the face, by hand, since a lockup that asks for a font draws in whatever the viewer has. |
-| `png/` | The square at 2 to 32 pixels a unit and the mark alone at 1 and 2, as favicons, transparent, for each ground: `npm install && npm run export`. |
+| `png/` | The square at 2 to 32 pixels a unit and the mark alone at 1 and 2, as favicons, transparent, for each ground: `npm install && npm run export`, or the `specimen` workflow dispatched with `references`, which renders them with the references. |
 
 ## Icons
 
