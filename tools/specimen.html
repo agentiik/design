@@ -25,8 +25,8 @@ a { color: var(--accent); }
 .button { font-family: var(--type-control-font); font-size: var(--type-control-size); font-weight: var(--type-control-weight); height: 30px; padding: 0 calc(var(--unit) * 6); border-radius: var(--radius-control); border: var(--border-hairline) solid var(--lineStrong); background: var(--raised); color: var(--text); cursor: pointer; }
 .button.primary { background: var(--accent); border-color: var(--accent); color: var(--onAccent); }
 main { padding: var(--padding-page); display: grid; gap: calc(var(--unit) * 9); max-width: 1280px; }
-.pane { position: relative; background: var(--surface); border: var(--border-hairline) solid var(--lineStrong); border-radius: var(--radius-pane); padding: calc(var(--padding-panel) + 6px) var(--padding-panel) var(--padding-panel); }
-.pane > h2 { position: absolute; top: -9px; left: 10px; margin: 0; padding: 0 6px; background: var(--bg); font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight); line-height: 18px; }
+.pane { position: relative; background: var(--surface); box-shadow: var(--shadowSheet); border-radius: var(--radius-sheet); padding: calc(var(--padding-panel) + 6px) var(--padding-panel) var(--padding-panel); }
+.pane > h2 { margin: 0 0 calc(var(--unit) * 6); font-family: var(--type-sectionTitle-font); font-size: var(--type-sectionTitle-size); font-weight: var(--type-sectionTitle-weight); line-height: 18px; }
 .pane > h2 a { color: inherit; text-decoration: none; }
 .pane > h2 a::after { content: " \2197"; color: var(--faint); }
 h3 { font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-size); font-weight: var(--type-columnHead-weight); letter-spacing: var(--type-columnHead-tracking); text-transform: var(--type-columnHead-case); color: var(--muted); margin: 0 0 calc(var(--unit) * 4); }
@@ -47,20 +47,32 @@ h3 { font-family: var(--type-columnHead-font); font-size: var(--type-columnHead-
 .surfaces > div:first-child { border-left: var(--border-hairline) solid var(--line); border-radius: var(--radius-card) 0 0 var(--radius-card); }
 .surfaces > div:last-child { border-radius: 0 var(--radius-card) var(--radius-card) 0; }
 
-.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: var(--border-hairline) solid; font-family: var(--type-name-font); font-weight: var(--type-name-weight); font-size: 12.5px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px 0 8px; border-radius: var(--radius-pill); font-family: var(--type-name-font); font-weight: var(--type-name-weight); font-size: 12.5px; }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.pill.succeeded { color: var(--succeeded); background: var(--succeededFill); border-color: var(--succeededLine); }
-.pill.running { color: var(--running); background: var(--accentDim); border-color: var(--accentLine); }
-.pill.waiting { color: var(--waiting); background: var(--waitingFill); border-color: var(--waitingLine); }
-.pill.failed, .pill.timed_out { color: var(--failed); background: var(--failedFill); border-color: var(--failedLine); }
-.pill.queued, .pill.cancelled, .pill.skipped { color: var(--faint); background: var(--sunken); border-color: var(--lineStrong); }
+.pill.succeeded { color: var(--succeeded); background: var(--succeededFill); }
+.pill.running { color: var(--running); background: var(--accentDim); }
+.pill.waiting { color: var(--waiting); background: var(--waitingFill); }
+.pill.failed, .pill.timed_out { color: var(--failed); background: var(--failedFill); }
+.pill.queued, .pill.cancelled, .pill.skipped { color: var(--muted); background: var(--sunken); }
+.pill.queued::before, .pill.cancelled::before, .pill.skipped::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.pill.running::before { animation: breathe 1.6s var(--motion-easeOut) infinite; }
+@keyframes breathe { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+.depths { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--unit) * 7); padding: calc(var(--unit) * 9); background: var(--bg); border-radius: var(--radius-card); }
+.depths > div { min-height: 96px; padding: calc(var(--unit) * 6); border-radius: var(--radius-card); color: var(--muted); }
+.depths b { display: block; color: var(--text); font-weight: 600; }
+.motion { display: grid; grid-template-columns: 170px 80px 1fr; gap: calc(var(--unit) * 5) calc(var(--unit) * 7); align-items: center; }
+.track { height: 6px; border-radius: var(--radius-round); background: var(--sunken); position: relative; }
+.track i { position: absolute; top: -3px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); animation: slide infinite alternate var(--motion-easeOut); }
+@keyframes slide { 0%, 20% { left: 0; } 80%, 100% { left: calc(100% - 12px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; } }
 
 .type { display: grid; grid-template-columns: 170px 1fr; gap: calc(var(--unit) * 4) calc(var(--unit) * 7); align-items: baseline; }
 .type .role { color: var(--muted); }
 
 .measure { display: grid; grid-template-columns: 170px 1fr; gap: calc(var(--unit) * 4) calc(var(--unit) * 7); align-items: center; }
 .measure .ruler { background: var(--accentDim); border: var(--border-hairline) solid var(--accentLine); border-radius: 2px; }
-.radius { width: 64px; height: 40px; background: var(--raised); border: var(--border-hairline) solid var(--lineStrong); }
+.radius { width: 64px; height: 40px; background: var(--raised); box-shadow: var(--shadowSheet); }
 .spec { display: grid; gap: calc(var(--unit) * 3); justify-items: start; }
 .border { width: 96px; height: 40px; background: var(--raised); border-style: solid; border-color: var(--lineStrong); border-radius: var(--radius-node); }
 
@@ -111,15 +123,15 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
   </div>
   <ul class="rules">
     <li><b>The accent is the only brand colour</b>, and marks what is interactive: primary buttons, links, selection, the selected row's marker, port dots on the graph.</li>
-    <li><b>The state ramp is separate from the accent</b>, except <code>running</code>, which borrows its hue because it is the live state. Hue is shared, form never is: a button is a solid fill with ink on it, a state an outlined pill with a dot.</li>
+    <li><b>The state ramp is separate from the accent</b>, except <code>running</code>, which borrows its hue because it is the live state. Hue is shared, form never is: a button is a solid fill of the accent with <code>onAccent</code> ink on it, a state a soft round pill, a pale fill of its hue with a dot and its word in the hue itself.</li>
     <li><b>No state is signalled by colour alone</b>: each carries a dot and a word, and a step strip adds position and width.</li>
     <li><b>Every word is drawn at 4.5:1 at least</b> against what it is drawn on, WCAG 2's level AA for text of ordinary size, whatever its role: <code>text</code>, <code>muted</code>, <code>faint</code> and the accent on each surface, a state's ink on its pill's fill, and <code>onAccent</code> on the accent. The word carries the state, and a word nobody can read carries none.</li>
-    <li><b>Elevation is ground value plus a hairline</b>, never a shadow, and four surface tokens are the whole vocabulary: <code>sunken</code> for code and payload panes, <code>bg</code> for the page, <code>surface</code> for panels and rails, <code>raised</code> for rows, controls and the active item.</li>
+    <li><b>Depth is ground value first</b>, and four surface tokens are the whole vocabulary: <code>sunken</code> for code and payload panes, <code>bg</code> for the ground the navigation lies on, <code>surface</code> for the sheet a screen is drawn on, <code>raised</code> for tiles, controls and the active item. A shadow is added in two places only, below.</li>
   </ul>
   <div class="row" style="margin-top: 18px; align-items: center">
-    <button class="button primary" type="button">Replay from invoice</button>
+    <button class="button primary" type="button">Replay from this step</button>
     <span class="pill running">running</span>
-    <span style="color: var(--muted)">One hue, two forms: the button is a fill with ink on it, the state an outlined pill with a dot.</span>
+    <span style="color: var(--muted)">One hue, two forms: the button is a solid fill with ink on it, the state a pale round pill with a dot.</span>
   </div>
 </section>
 
@@ -129,7 +141,33 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
 {{pills}}
   </div>
   <ul class="rules">
-    <li><b><code>queued</code>, <code>skipped</code> and <code>cancelled</code> take faint</b>: they are the absence of a state, not one.</li>
+    <li><b><code>queued</code>, <code>skipped</code> and <code>cancelled</code> take muted on sunken, their dot hollow</b>: they are the absence of a state, not one.</li>
+    <li><b><code>running</code> breathes</b>, the one state that moves, and stops under a reduced-motion preference, its dot and word still saying it.</li>
+  </ul>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#surfaces-and-depth">Surfaces and depth</a></h2>
+  <div class="depths">
+    <div><b>Ground</b><code>bg</code>, no shadow: the navigation.</div>
+    <div style="background: var(--surface); box-shadow: var(--shadowSheet)"><b>Sheet</b><code>surface</code> and <code>shadowSheet</code>: the screen.</div>
+    <div style="background: var(--glass); box-shadow: var(--shadowFloat); backdrop-filter: blur(14px)"><b>Float</b><code>glass</code> and <code>shadowFloat</code>: the palette, a menu.</div>
+  </div>
+  <ul class="rules">
+    <li><b>A shadow says that something is above something else</b>, and nothing else: no card, row or button carries one for emphasis.</li>
+    <li><b>Glass is the fill of a floating layer</b> and of nothing that holds content.</li>
+    <li><b>A hairline separates the rows of a list</b> and nothing else. A pane is set off by its surface and its ring.</li>
+  </ul>
+</section>
+
+<section class="pane">
+  <h2><a href="https://agentiik.github.io/docs#motion">Motion</a></h2>
+  <div class="motion">
+{{motion}}
+  </div>
+  <ul class="rules">
+    <li><b>What runs moves, and nothing else does</b>: the running dot, a running step's bar and an edge carrying items. The tracks above run eight times slower than the console does.</li>
+    <li><b>Under a reduced-motion preference nothing moves</b>, and nothing is lost: a state keeps its dot and its word.</li>
   </ul>
 </section>
 
@@ -139,7 +177,7 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
 {{type}}
   </div>
   <ul class="rules">
-    <li><b>Two faces, no third</b>, both from Google Fonts with a system fallback stack.</li>
+    <li><b>Two faces, no third</b>, both from Google Fonts with a system fallback stack. Archivo's width axis sets the page title at 112 and a headline figure at 104, every other role at 100.</li>
     <li><b>Code is monospaced, and nothing else</b>: run identifiers, commit and image digests, exit codes, YAML, JSON, logs and expressions are JetBrains Mono, since a person copies, diffs and matches them against a log. Namespaces, workflow, step and port names, logins and permission names are names, Archivo at 500; timestamps, durations and counts are Archivo with tabular figures, so that a column of them still lines up. A screen of names set in a monospace reads as a terminal, which the web console is not; <code>agk console</code> draws everything in the terminal's face.</li>
   </ul>
   <div class="example" style="margin-top: 14px">Run <code>01JMZ8V1P9C4</code> of <span class="name">finance/monthly-invoicing</span> failed at <span class="name">invoice</span> after <span class="figure">1m 52s</span>, image <code>sha256:1ab74e…39cc</code>, which <span class="name">run:read_data</span> lets you open.</div>
@@ -199,7 +237,7 @@ footer { padding: var(--padding-page); color: var(--faint); border-top: var(--bo
   <h2><a href="https://agentiik.github.io/docs#voice">Voice</a></h2>
   <ul class="rules" style="margin-top: 0">
     <li><b>Sentence case throughout</b>, buttons, tabs and headings included.</li>
-    <li><b>A control names its effect</b>: Approve, Reject, Replay from invoice, Load 25 more. Never OK, never Submit.</li>
+    <li><b>A control names its effect</b>: Approve, Reject, Replay from this step, Load 25 more. Never OK, never Submit.</li>
     <li><b>An error names the step, the exit code and what was refused</b>, in that order.</li>
     <li><b>Identifiers are never translated or prettified</b>: <code>run:read_data</code>, <code>rejected</code>, <code>succeeded</code> appear as the YAML and the API spell them, so what a person reads on screen is what they type in a file.</li>
   </ul>

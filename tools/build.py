@@ -24,7 +24,14 @@ hold:
   WCAG 2's, from each colour's relative luminance, so that it is the figure an audit
   computes.
 - Each type role names a face the tokens declare, at a weight that face is loaded with: a
-  weight nobody loads is drawn by the browser's synthesis, never by the typeface.
+  weight nobody loads is drawn by the browser's synthesis, never by the typeface. A role that
+  sets a width sets one the face's width axis reaches, for the same reason.
+- Both grounds carry the same depths, the chapter's Surfaces and depth: two shadows, the
+  glass of what floats and the scrim under it, every colour in them #RRGGBBAA in capitals,
+  since a shadow or a glass is a colour seen through.
+- Motion's three durations rise, dur1 under dur2 under dur3, each a whole number of
+  milliseconds, and each easing is a cubic-bezier(): the chapter's Motion orders them by
+  what they move, a hover before a menu before a screen.
 - Every gap is a whole number of base units, since the unit is what the rhythm is made of.
 - The mark's bars sit on its grid, one row under the other without touching, the bars of a
   row side by side without touching, each row at a strength above none and at most full,
@@ -85,6 +92,9 @@ CORE = [
 ]
 
 HEX = re.compile(r"^#[0-9A-F]{6}$")
+HEXA = re.compile(r"^#[0-9A-F]{8}$")
+DEPTHS = ["shadowSheet", "shadowFloat", "glass", "scrim"]
+BEZIER = re.compile(r"^cubic-bezier\((-?[0-9.]+), (-?[0-9.]+), (-?[0-9.]+), (-?[0-9.]+)\)$")
 
 # The level every word keeps against what it is drawn on, and the pairings that draw a word: a
 # token on a surface, a state's ink on its pill, the ink of a button on its fill. A hairline or a
@@ -158,6 +168,29 @@ def check_source(t):
         for key in ("weight", "weightActive", "weightName"):
             if key in spec and spec[key] not in face["weights"]:
                 problems.append(f"type.{role}.{key} is {spec[key]}, a weight {spec['font']} is not loaded with")
+        if "width" in spec:
+            widths = face.get("widths")
+            if not widths or not widths["min"] <= spec["width"] <= widths["max"]:
+                problems.append(f"type.{role}.width is {spec['width']}, a width {spec['font']} is not served with")
+
+    depth = t["depth"]
+    if set(depth) != set(grounds):
+        problems.append(f"depth has grounds {sorted(depth)}, where colour has {sorted(grounds)}")
+    for g, values in depth.items():
+        if sorted(values) != sorted(DEPTHS):
+            problems.append(f"depth.{g} carries {sorted(values)}, where the depths are {', '.join(DEPTHS)}")
+        for name, value in values.items():
+            found = re.findall(r"#[0-9A-Za-z]+", value) if name.startswith("shadow") else [value]
+            if not found or any(not HEXA.match(c) for c in found):
+                problems.append(f"depth.{g}.{name} is {value!r}, whose colours are not #RRGGBBAA in capitals")
+
+    motion = t["motion"]
+    durations = [motion.get(f"dur{i}") for i in (1, 2, 3)]
+    if not all(isinstance(d, int) and d > 0 for d in durations) or durations != sorted(set(durations)):
+        problems.append(f"motion's durations are {durations}, where they are whole milliseconds rising from dur1 to dur3")
+    for name in ("easeOut", "easeSpring"):
+        if not BEZIER.match(motion.get(name, "")):
+            problems.append(f"motion.{name} is {motion.get(name)!r}, not cubic-bezier(x1, y1, x2, y2)")
 
     unit = t["density"]["unit"]
     for gap in t["density"]["gaps"]:
@@ -209,6 +242,7 @@ def render(t):
     out.append(":root {\n")
     out.append("  color-scheme: light;\n")
     out.append(colours(t["colour"]["light"], "  "))
+    out.append(colours(t["depth"]["light"], "  "))
     out.append("\n")
     out.append(f"  --font-sans: {stack(t['font']['sans'])};\n")
     out.append(f"  --font-mono: {stack(t['font']['mono'])};\n")
@@ -224,6 +258,8 @@ def render(t):
         for key in ("weight", "weightActive", "weightName"):
             if key in spec:
                 out.append(f"  --type-{role}-{key}: {spec[key]};\n")
+        if "width" in spec:
+            out.append(f"  --type-{role}-width: {spec['width']}%;\n")
         if "tracking" in spec:
             out.append(f"  --type-{role}-tracking: {spec['tracking']};\n")
         if "case" in spec:
@@ -245,9 +281,12 @@ def render(t):
     for group in ("bar", "sidebar", "row", "padding", "radius", "border"):
         for name, value in d[group].items():
             out.append(f"  --{group}-{name}: {px(value)};\n")
+    out.append("\n")
+    for name, value in t["motion"].items():
+        out.append(f"  --motion-{name}: {value}ms;\n" if name.startswith("dur") else f"  --motion-{name}: {value};\n")
     out.append("}\n\n")
 
-    dark = colours(t["colour"]["dark"], "    ")
+    dark = colours(t["colour"]["dark"], "    ") + colours(t["depth"]["dark"], "    ")
     out.append("@media (prefers-color-scheme: dark) {\n")
     out.append("  :root:not([data-theme=\"light\"]) {\n")
     out.append("    color-scheme: dark;\n")
@@ -257,6 +296,7 @@ def render(t):
     out.append(":root[data-theme=\"dark\"] {\n")
     out.append("  color-scheme: dark;\n")
     out.append(colours(t["colour"]["dark"], "  "))
+    out.append(colours(t["depth"]["dark"], "  "))
     out.append("}\n")
     return "".join(out)
 
@@ -362,10 +402,11 @@ SAMPLES = {
     "pageTitle": "monthly-invoicing",
     "sectionTitle": "Reading a run, end to end",
     "navigation": "Runs · Workflows · Statistics · Bricks · Sharing",
-    "control": "Replay from invoice",
+    "control": "Replay from this step",
     "body": "Failures sit in a band above the table: they are almost always why the page is opened.",
     "columnHead": "Started",
     "name": "finance/monthly-invoicing · alice · invoice.ok",
+    "metric": "174 runs · 18 failed",
     "identifier": "01JMZ8V1P9C4 · a3f9c1e · exit 108",
     "code": "invoice:\n  needs:\n    - { step: normalize, port: ok, as: in }",
 }
@@ -379,6 +420,8 @@ def html_escape(text):
 def type_style(role, spec):
     size = f"var(--type-{role}-size-max)" if isinstance(spec["size"], dict) else f"var(--type-{role}-size)"
     parts = [f"font-family: var(--type-{role}-font)", f"font-size: {size}", f"font-weight: var(--type-{role}-weight)"]
+    if "width" in spec:
+        parts.append(f"font-stretch: var(--type-{role}-width)")
     if "tracking" in spec:
         parts.append(f"letter-spacing: var(--type-{role}-tracking)")
     if "case" in spec:
@@ -396,6 +439,8 @@ def type_caption(t, role, spec):
     for key, word in (("weightActive", "when active"), ("weightName", "on a name")):
         if key in spec:
             extra.append(f"{spec[key]} {word}")
+    if "width" in spec:
+        extra.append(f"width {spec['width']}")
     if "lineHeight" in spec:
         extra.append(f"line height {spec['lineHeight']['min']:g} to {spec['lineHeight']['max']:g}px")
     return f"{face} {size} / {spec['weight']}" + (", " + ", ".join(extra) if extra else "")
@@ -416,6 +461,9 @@ def render_specimen(t, icons):
         f'    <span class="role"><code>{role}</code><br>{type_caption(t, role, spec)}</span>'
         f'<span style="{type_style(role, spec)}">{html_escape(SAMPLES[role])}</span>'
         for role, spec in t["type"].items())
+    motion = "\n".join(
+        f'    <code>motion.{n}</code><span class="figure">{t["motion"][n]}ms</span><div class="track"><i style="animation-duration: calc(var(--motion-{n}) * 8)"></i></div>'
+        for n in ("dur1", "dur2", "dur3"))
     radii = "\n".join(
         f'    <div class="spec"><div class="radius" style="border-radius: var(--radius-{n})"></div><code>radius.{n}</code></div>'
         for n in t["density"]["radius"])
@@ -437,6 +485,7 @@ def render_specimen(t, icons):
         "pills": pills,
         "type": types,
         "radii": radii,
+        "motion": motion,
         "icons": "\n".join(blocks),
     }
     page = SPECIMEN_TEMPLATE.read_text(encoding="utf-8")
